@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Bank</title>
+    <style>
+        :root {
+            --primary-color: #005A9C;
+            --primary-color-dark: #004170;
+            --secondary-color: #F0F8FF;
+            --text-color: #333;
+            --text-color-light: #666;
+            --white: #FFFFFF;
+            --danger-color: #D9534F;
+            --success-color: #5CB85C;
+            --border-color: #DDD;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        main {
+            padding: 1.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #auth-section h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-color-dark);
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .toggle-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h2 {
+            margin: 0;
+        }
+
+        .balance-display {
+            background-color: var(--secondary-color);
+            border-left: 5px solid var(--primary-color);
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+        }
+
+        .balance-display p {
+            margin: 0;
+            color: var(--text-color-light);
+            font-size: 1rem;
+        }
+
+        .balance-display .balance {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dashboard-section {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .dashboard-section h3 {
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-section p {
+            color: var(--text-color-light);
+        }
+
+        .dashboard-section .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+            color: var(--white);
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            min-width: 250px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .alert.success {
+            background-color: var(--success-color);
+        }
+
+        .alert.error {
+            background-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header id="app-header" class="hidden">
+            <h1>AR Bank</h1>
+            <button id="logout-btn" class="btn">Logout</button>
+        </header>
+        
+        <main>
+            <!-- AUTHENTICATION -->
+            <section id="auth-section">
+                <!-- Login Form -->
+                <div id="login-form-container">
+                    <h2>Login</h2>
+                    <form id="login-form" class="form">
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="button" id="btn-login-action" class="btn">Login</button>
+                    </form>
+                    <p class="toggle-link">Don't have an account? <a href="#" id="show-signup-link">Sign Up</a></p>
+                </div>
+
+                <!-- Signup Form -->
+                <div id="signup-form-container" class="hidden">
+                    <h2>Sign Up</h2>
+                    <form id="signup-form" class="form">
+                        <div class="form-group">
+                            <label for="signup-username">Username</label>
+                            <input type="text" id="signup-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-password">Password</label>
+                            <input type="password" id="signup-password" required>
+                        </div>
+                        <button type="button" id="btn-signup-action" class="btn">Sign Up</button>
+                    </form>
+                    <p class="toggle-link">Already have an account? <a href="#" id="show-login-link">Login</a></p>
+                </div>
+            </section>
+
+            <!-- USER DASHBOARD -->
+            <section id="user-dashboard" class="hidden">
+                <div class="dashboard-header">
+                    <h2 id="welcome-message"></h2>
+                </div>
+                <div class="balance-display">
+                    <p>Current Balance</p>
+                    <h1 id="balance-amount" class="balance">PKR 0.00</h1>
+                </div>
+
+                <div class="dashboard-section">
+                    <h3>Transfer Money</h3>
+                    <form id="transfer-form" class="form">
+                        <div class="form-group">
+                            <label for="receiver-username">Receiver's Username</label>
+                            <input type="text" id="receiver-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transfer-amount">Amount (PKR)</label>
+                            <input type="number" id="transfer-amount" step="0.01" min="1" required>
+                        </div>
+                        <button type="submit" class="btn">Send Money</button>
+                    </form>
+                </div>
+                
+                 <div class="dashboard-section">
+                    <h3>Transaction History</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Party</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-transactions-table-body">
+                           <!-- Rows will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ADMIN DASHBOARD -->
+            <section id="admin-dashboard" class="hidden">
+                 <div class="dashboard-header">
+                    <h2>Admin Panel</h2>
+                </div>
+                <div class="dashboard-section">
+                    <h3>All Customers & Balances</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Balance (PKR)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="dashboard-section">
+                    <h3>Danger Zone</h3>
+                    <p>This action is irreversible and will delete all user and transaction data.</p>
+                    <button id="reset-system-btn" class="btn btn-danger">RESET SYSTEM</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="alert-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_URL = ' ';
+            console.log('Frontend script loaded. API URL:', API_URL);
+
+            // --- DOM ELEMENTS ---
+            const appHeader = document.getElementById('app-header');
+            const authSection = document.getElementById('auth-section');
+            const loginFormContainer = document.getElementById('login-form-container');
+            const signupFormContainer = document.getElementById('signup-form-container');
+            const userDashboard = document.getElementById('user-dashboard');
+            const adminDashboard = document.getElementById('admin-dashboard');
+            
+            const btnLoginAction = document.getElementById('btn-login-action');
+            const btnSignupAction = document.getElementById('btn-signup-action');
+            const showSignupLink = document.getElementById('show-signup-link');
+            const showLoginLink = document.getElementById('show-login-link');
+            const logoutBtn = document.getElementById('logout-btn');
+            const transferForm = document.getElementById('transfer-form');
+            const resetSystemBtn = document.getElementById('reset-system-btn');
+
+            const welcomeMessage = document.getElementById('welcome-message');
+            const balanceAmount = document.getElementById('balance-amount');
+            const adminUsersTableBody = document.getElementById('admin-users-table-body');
+            const userTransactionsTableBody = document.getElementById('user-transactions-table-body');
+
+            // --- HELPERS ---
+            const formatCurrency = (amount) => `PKR ${parseFloat(amount).toFixed(2)}`;
+
+            const showAlert = (message, type = 'success') => {
+                console.log(`[ALERT-${type.toUpperCase()}]: ${message}`);
+                const alertContainer = document.getElementById('alert-container');
+                const alert = document.createElement('div');
+                alert.className = `alert ${type}`;
+                alert.textContent = message;
+                alertContainer.appendChild(alert);
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 3000);
+            };
+
+            const showView = (view) => {
+                console.log(`Switching view to: ${view}`);
+                authSection.classList.add('hidden');
+                userDashboard.classList.add('hidden');
+                adminDashboard.classList.add('hidden');
+                appHeader.classList.add('hidden');
+
+                if (view === 'auth') {
+                    authSection.classList.remove('hidden');
+                } else if (view === 'user') {
+                    userDashboard.classList.remove('hidden');
+                    appHeader.classList.remove('hidden');
+                } else if (view === 'admin') {
+                    adminDashboard.classList.remove('hidden');
+                    appHeader.classList.remove('hidden');
+                }
+            };
+            
+            // --- DASHBOARD RENDERING ---
+            const renderUserDashboard = async (username, balance) => {
+                welcomeMessage.textContent = `Welcome, ${username}!`;
+                balanceAmount.textContent = formatCurrency(balance);
+                
+                try {
+                    console.log(`Fetching transaction history for ${username}`);
+                    const response = await fetch(`${API_URL}/history/${username}`);
+                    const transactions = await response.json();
+                    if (!response.ok) throw new Error(transactions.detail || 'Failed to fetch history');
+                    
+                    console.log('Received transactions:', transactions);
+                    userTransactionsTableBody.innerHTML = '';
+                    transactions.forEach(tx => {
+                        const row = userTransactionsTableBody.insertRow();
+                        const type = tx.sender === username ? 'Sent' : 'Received';
+                        const party = tx.sender === username ? tx.receiver : tx.sender;
+                        row.insertCell(0).textContent = type;
+                        row.insertCell(1).textContent = party;
+                        row.insertCell(2).textContent = formatCurrency(tx.amount);
+                        row.insertCell(3).textContent = new Date(tx.timestamp).toLocaleString();
+                    });
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+                showView('user');
+            };
+
+            const renderAdminDashboard = async (username) => {
+                welcomeMessage.textContent = `Welcome, Admin ${username}!`;
+                try {
+                    console.log(`Fetching admin stats for ${username}`);
+                    const response = await fetch(`${API_URL}/admin/stats?current_username=${username}`);
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.detail || 'Failed to fetch admin stats');
+                    
+                    console.log('Received admin stats:', data);
+                    adminUsersTableBody.innerHTML = '';
+                    data.all_customers_and_balances.forEach(user => {
+                        const row = adminUsersTableBody.insertRow();
+                        row.insertCell(0).textContent = user.username;
+                        row.insertCell(1).textContent = formatCurrency(user.balance);
+                    });
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+                showView('admin');
+            };
+
+            // --- EVENT HANDLERS ---
+            showSignupLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginFormContainer.classList.add('hidden');
+                signupFormContainer.classList.remove('hidden');
+            });
+
+            showLoginLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                signupFormContainer.classList.add('hidden');
+                loginFormContainer.classList.remove('hidden');
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                console.log('Logging out.');
+                localStorage.clear();
+                showView('auth');
+                showAlert('You have been logged out.');
+            });
+
+            btnSignupAction.addEventListener('click', async () => {
+                const username = document.getElementById('signup-username').value;
+                const password = document.getElementById('signup-password').value;
+                console.log(`Attempting signup for user: ${username}`);
+
+                try {
+                    const response = await fetch(`${API_URL}/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password }),
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.detail || 'Signup failed');
+                    
+                    console.log('Signup successful:', data);
+                    showAlert('Registration successful! Please login.');
+                    document.getElementById('signup-form').reset();
+                    showLoginLink.click();
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+            });
+
+            btnLoginAction.addEventListener('click', async () => {
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+                console.log(`Attempting login for user: ${username}`);
+
+                try {
+                    const response = await fetch(`${API_URL}/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password }),
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.detail || 'Login failed');
+                    
+                    console.log('Login successful:', data);
+                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('is_admin', data.is_admin);
+                    localStorage.setItem('balance', data.balance);
+
+                    showAlert(`Welcome back, ${data.username}!`);
+                    document.getElementById('login-form').reset();
+                    
+                    if (data.is_admin) {
+                        renderAdminDashboard(data.username);
+                    } else {
+                        renderUserDashboard(data.username, data.balance);
+                    }
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+            });
+            
+            transferForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const receiver_username = document.getElementById('receiver-username').value;
+                const amount = parseFloat(document.getElementById('transfer-amount').value);
+                const current_username = localStorage.getItem('username');
+                
+                console.log(`Transferring ${amount} from ${current_username} to ${receiver_username}`);
+                if (!current_username) return showAlert('You are not logged in.', 'error');
+
+                try {
+                    const response = await fetch(`${API_URL}/transfer?current_username=${current_username}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ receiver_username, amount }),
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.detail || 'Transfer failed');
+                    
+                    console.log('Transfer successful:', data);
+                    const newBalance = parseFloat(localStorage.getItem('balance')) - amount;
+                    localStorage.setItem('balance', newBalance);
+                    
+                    showAlert('Transfer successful!');
+                    transferForm.reset();
+                    renderUserDashboard(current_username, newBalance); // Refresh dashboard
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+            });
+            
+            resetSystemBtn.addEventListener('click', async () => {
+                const current_username = localStorage.getItem('username');
+                if (!confirm('ARE YOU SURE you want to reset the entire system? This is irreversible.')) return;
+
+                console.log(`System reset initiated by ${current_username}`);
+                try {
+                    const response = await fetch(`${API_URL}/admin/reset?current_username=${current_username}`, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.detail || 'Reset failed');
+                    
+                    showAlert(data.message);
+                    renderAdminDashboard(current_username); // Refresh admin view
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                }
+            });
+
+            // --- INITIALIZATION ---
+            const loggedInUser = localStorage.getItem('username');
+            if (loggedInUser) {
+                console.log(`Found logged in user: ${loggedInUser}`);
+                const isAdmin = localStorage.getItem('is_admin') === 'true';
+                const balance = localStorage.getItem('balance');
+                if (isAdmin) {
+                    renderAdminDashboard(loggedInUser);
+                } else {
+                    renderUserDashboard(loggedInUser, balance);
+                }
+            } else {
+                console.log('No user found in localStorage. Showing auth view.');
+                showView('auth');
+            }
+        });
+    </script>
+</body>
+</html>
