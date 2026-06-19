@@ -22,22 +22,26 @@ export async function transferAction(
   }
   const { receiverUsername, amount } = parsed.data;
 
-  if (receiverUsername === session.username) {
+  if (receiverUsername.toLowerCase() === session.username.toLowerCase()) {
     return { error: "You cannot transfer money to yourself" };
   }
+
+  let receiverActualUsername = receiverUsername;
 
   try {
     await prisma.$transaction(async (tx) => {
       const sender = await tx.user.findUnique({
         where: { id: session.userId },
       });
-      const receiver = await tx.user.findUnique({
-        where: { username: receiverUsername },
+      const receiver = await tx.user.findFirst({
+        where: { username: { equals: receiverUsername, mode: "insensitive" } },
       });
 
       if (!sender) throw new Error("Sender not found");
       if (!receiver) throw new Error("Receiver not found");
       if (sender.balance < amount) throw new Error("Insufficient balance");
+
+      receiverActualUsername = receiver.username;
 
       await tx.user.update({
         where: { id: sender.id },
@@ -59,7 +63,7 @@ export async function transferAction(
 
   revalidatePath("/dashboard");
   return {
-    success: `Successfully transferred ${amount} to ${receiverUsername}`,
+    success: `Successfully transferred ${amount} to ${receiverActualUsername}`,
   };
 }
 

@@ -26,7 +26,9 @@ export async function registerAction(
   }
   const { username, password } = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { username } });
+  const existing = await prisma.user.findFirst({
+    where: { username: { equals: username, mode: "insensitive" } },
+  });
   if (existing) {
     return { error: "Username already registered" };
   }
@@ -57,7 +59,9 @@ export async function loginAction(
   }
   const { username, password } = parsed.data;
 
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findFirst({
+    where: { username: { equals: username, mode: "insensitive" } },
+  });
   if (!user) {
     return { error: "Invalid username or password" };
   }
