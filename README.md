@@ -9,6 +9,30 @@
 
 ---
 
+## 👀 What Can You Do With This App?
+
+Think of it as a mini online bank you can try out for free, right in your browser — no real money, no risk.
+
+### 🙋 If you're a regular customer
+
+- **Create your own account** in a few seconds — just pick a username and password.
+- **Get a free welcome bonus** of Rs. 1,000 the moment you sign up.
+- **Send money** to any other user on the platform instantly, just by typing their username.
+- **Watch your balance update** the moment a transfer goes through.
+- **Check your full transaction history** — every rupee sent or received, with the date and time.
+- **Change your password** any time from your dashboard.
+
+### 🛡️ If you log in as the Admin
+
+- **See every customer** registered on the platform and their current balance, all in one table.
+- **See the total amount of money** circulating across the entire bank.
+- **View every transaction** that has ever happened between any two users.
+- **Reset the whole system** back to a clean slate with one click — handy for demos.
+
+Want to try it yourself? Open the [live demo](https://ar-bank-management-system.vercel.app), sign up with any username, and start sending money to other test accounts.
+
+---
+
 ## 🚀 Features
 
 ### 👤 User Panel
