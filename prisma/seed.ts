@@ -1,35 +1,49 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { neonConfig } from "@neondatabase/serverless";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import ws from "ws";
 import { PrismaClient } from "../app/generated/prisma/client";
 
-const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL ?? "file:./bank.db",
-});
+neonConfig.webSocketConstructor = ws;
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL environment variable is not set");
+}
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  const username = process.env.ADMIN_USERNAME ?? "admin";
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!password) {
+    throw new Error(
+      "ADMIN_PASSWORD environment variable is required to seed the admin account. Set it in your .env file.",
+    );
+  }
+
   const existingAdmin = await prisma.user.findUnique({
-    where: { username: "admin" },
+    where: { username },
   });
 
   if (existingAdmin) {
-    console.log("Admin user already exists, skipping seed.");
+    console.log(`Admin user "${username}" already exists, skipping seed.`);
     return;
   }
 
-  const passwordHash = await bcrypt.hash("admin123", 10);
+  const passwordHash = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
     data: {
-      username: "admin",
+      username,
       passwordHash,
       balance: 1_000_000,
       isAdmin: true,
     },
   });
 
-  console.log("Created admin user (username: admin, password: admin123)");
+  console.log(`Created admin user "${username}".`);
 }
 
 main()

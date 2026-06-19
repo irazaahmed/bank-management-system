@@ -28,7 +28,7 @@ A complete banking system where users can sign up, login, and transfer money.
 - Logic: Deduct from Sender -> Add to Receiver -> Log Transaction.
 
 ### C. The Admin Dashboard (Owner's View)
-- **Admin User:** The username `admin` (password: `admin123`) is special.
+- **Admin User:** The username `admin` (password set via the `ADMIN_PASSWORD` environment variable) is special.
 - When `admin` logs in:
     - Do NOT show transfer options.
     - **INSTEAD SHOW:** A "Master List" of all users and their current balances.
@@ -63,6 +63,6 @@ A complete banking system where users can sign up, login, and transfer money.
 
 ## 7. Initialization
 - On startup, create a Superuser automatically:
-    - Username: `admin`
-    - Password: `admin123`
+    - Username: from `ADMIN_USERNAME` env var (defaults to `admin`)
+    - Password: from `ADMIN_PASSWORD` env var (required, not hardcoded)
     - Balance: 1,000,000

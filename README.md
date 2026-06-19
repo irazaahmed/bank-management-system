@@ -26,7 +26,7 @@
 ## 🛠️ Tech Stack
 
 - **Framework:** Next.js 16 (App Router, Server Actions, TypeScript)
-- **Database:** SQLite, via Prisma ORM
+- **Database:** PostgreSQL ([Neon](https://neon.tech)), via Prisma ORM
 - **Styling:** Tailwind CSS
 - **Auth:** bcryptjs password hashing + signed JWT session cookies (jose)
 - **Validation:** Zod
@@ -49,7 +49,11 @@ npm install
 cp .env.example .env
 ```
 
-Edit `.env` and set a real `SESSION_SECRET` (e.g. `openssl rand -base64 32`).
+Edit `.env` and set:
+
+- `DATABASE_URL` — a Postgres connection string (e.g. from [Neon](https://neon.tech))
+- `SESSION_SECRET` — a real random value (e.g. `openssl rand -base64 32`)
+- `ADMIN_USERNAME` / `ADMIN_PASSWORD` — credentials for the seeded admin account (pick your own; not committed to the repo)
 
 ### 3. Set up the database
 
@@ -58,11 +62,9 @@ npm run db:migrate
 npm run db:seed
 ```
 
-This creates `bank.db` and seeds the admin account:
-
-- **Username:** `admin`
-- **Password:** `admin123`
-- **Balance:** Rs. 1,000,000
+This creates the schema and seeds the admin account using the
+`ADMIN_USERNAME` / `ADMIN_PASSWORD` you set in `.env`, with a starting
+balance of Rs. 1,000,000.
 
 ### 4. Run the dev server
 
@@ -82,7 +84,7 @@ app/
   login/, register/, dashboard/, admin/   Route pages
   ui/             Shared UI components
 lib/
-  prisma.ts       Prisma client (better-sqlite3 driver adapter)
+  prisma.ts       Prisma client (Neon serverless driver adapter)
   session.ts      JWT session encrypt/decrypt + cookie helpers
   dal.ts          Data access layer (session verification, current user)
   validation.ts   Zod schemas
