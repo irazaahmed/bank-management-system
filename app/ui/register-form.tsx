@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { Lock, Sparkles, User } from "lucide-react";
 import { registerAction } from "@/app/actions/auth";
 import { SubmitButton } from "@/app/ui/submit-button";
 import { TextField } from "@/app/ui/text-field";
@@ -19,6 +20,7 @@ export function RegisterForm() {
         minLength={3}
         maxLength={20}
         autoComplete="username"
+        icon={User}
       />
       <TextField
         label="Password"
@@ -27,9 +29,11 @@ export function RegisterForm() {
         required
         minLength={6}
         autoComplete="new-password"
+        icon={Lock}
       />
 
-      <p className="text-xs text-gray-500">
+      <p className="flex items-center gap-1.5 text-xs text-amber-700">
+        <Sparkles className="h-3.5 w-3.5" />
         New accounts start with a welcome bonus of Rs. 1,000.
       </p>
 

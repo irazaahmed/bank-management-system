@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { Lock, User } from "lucide-react";
 import { loginAction } from "@/app/actions/auth";
 import { SubmitButton } from "@/app/ui/submit-button";
 import { TextField } from "@/app/ui/text-field";
@@ -17,6 +18,7 @@ export function LoginForm() {
         required
         autoFocus
         autoComplete="username"
+        icon={User}
       />
       <TextField
         label="Password"
@@ -24,6 +26,7 @@ export function LoginForm() {
         type="password"
         required
         autoComplete="current-password"
+        icon={Lock}
       />
 
       {state?.error && (

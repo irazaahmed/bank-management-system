@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Trash2 } from "lucide-react";
 import { resetSystemAction } from "@/app/actions/bank";
 import { SubmitButton } from "@/app/ui/submit-button";
 
@@ -21,7 +22,10 @@ export function ResetButton() {
       className="space-y-3"
     >
       <SubmitButton variant="danger" pendingText="Resetting...">
-        Reset System
+        <span className="flex items-center justify-center gap-2">
+          <Trash2 className="h-4 w-4" />
+          Reset System
+        </span>
       </SubmitButton>
 
       {state?.error && (

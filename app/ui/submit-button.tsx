@@ -16,10 +16,12 @@ export function SubmitButton({
   const { pending } = useFormStatus();
 
   const base =
-    "w-full rounded-lg px-4 py-2.5 font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60";
+    "w-full rounded-lg px-4 py-2.5 font-medium text-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-sm";
   const variants = {
-    primary: "bg-blue-700 hover:bg-blue-800",
-    danger: "bg-red-600 hover:bg-red-700",
+    primary:
+      "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700",
+    danger:
+      "bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700",
   };
 
   return (

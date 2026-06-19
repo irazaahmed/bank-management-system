@@ -1,3 +1,5 @@
+import { Landmark } from "lucide-react";
+
 export function AuthShell({
   title,
   subtitle,
@@ -8,11 +10,22 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-1 items-center justify-center bg-blue-50 px-4 py-12">
-      <div className="w-full max-w-md overflow-hidden rounded-xl bg-white shadow-lg">
-        <div className="bg-blue-700 px-8 py-6 text-white">
-          <h1 className="text-2xl font-bold">AR Bank Limited</h1>
-          <p className="mt-1 text-sm text-blue-100">Online Banking Made Simple</p>
+    <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-800 px-4 py-12">
+      <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-sky-400/30 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-16 h-80 w-80 rounded-full bg-violet-400/30 blur-3xl" />
+      <div className="pointer-events-none absolute left-1/2 top-1/3 h-56 w-56 -translate-x-1/2 rounded-full bg-amber-300/10 blur-3xl" />
+
+      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div className="relative bg-gradient-to-r from-blue-700 to-indigo-700 px-8 py-7 text-white">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/30">
+              <Landmark className="h-6 w-6" strokeWidth={2} />
+            </span>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight">AR Bank Limited</h1>
+              <p className="text-xs text-blue-100">Online Banking Made Simple</p>
+            </div>
+          </div>
         </div>
         <div className="px-8 py-8">
           <h2 className="mb-1 text-xl font-semibold text-gray-900">{title}</h2>
