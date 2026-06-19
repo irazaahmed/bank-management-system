@@ -5,7 +5,7 @@
 ![Project Status](https://img.shields.io/badge/Status-Completed-success)
 ![Tech Stack](https://img.shields.io/badge/Tech-Next.js%20%7C%20Prisma%20%7C%20PostgreSQL-blue)
 
-**🔗 Live Demo:** [bank-management-system-kappa-rose.vercel.app](https://bank-management-system-kappa-rose.vercel.app)
+**🔗 Live Demo:** [ar-bank-management-system.vercel.app](https://ar-bank-management-system.vercel.app)
 
 ---
 
